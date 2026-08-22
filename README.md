@@ -1,15 +1,50 @@
-# support-ticket-sla-tracker
+ Support Ticket & SLA Tracker
 
-To install dependencies:
+A backend application for managing customer support tickets and tracking SLA deadlines.
 
-```bash
-bun install
-```
+ Tech Stack
 
-To run:
+- Bun
+- TypeScript
+- GraphQL Yoga
+- PostgreSQL
+- Prisma ORM
+- Docker Compose
 
-```bash
-bun run index.ts
-```
+ Features
 
-This project was created using `bun init` in bun v1.4.0. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
+- Create support tickets
+- List all tickets
+- Get a ticket by ID
+- Update ticket status
+- Ticket priorities: LOW, MEDIUM, HIGH, URGENT
+- Automatic SLA deadline calculation
+- SLA breach detection
+- Resolution timestamp tracking
+- Input validation
+- PostgreSQL persistence
+
+ SLA Rules
+
+| Priority | SLA |
+|---|---:|
+| LOW | 72 hours |
+| MEDIUM | 48 hours |
+| HIGH | 24 hours |
+| URGENT | 4 hours |
+
+ Project Structure
+
+```text
+support-ticket-sla-tracker/
+├── index.ts
+├── lib/
+│   └── prisma.ts
+├── prisma/
+│   ├── migrations/
+│   └── schema.prisma
+├── docker-compose.yml
+├── prisma.config.ts
+├── package.json
+├── tsconfig.json
+└── .env

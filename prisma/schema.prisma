@@ -7,6 +7,12 @@ datasource db {
   provider = "postgresql"
 }
 
+enum UserRole {
+  ADMIN
+  AGENT
+  CUSTOMER
+}
+
 enum TicketStatus {
   OPEN
   IN_PROGRESS
@@ -21,19 +27,69 @@ enum TicketPriority {
   URGENT
 }
 
+model User {
+  id           String    @id @default(uuid())
+  name         String
+  email        String    @unique
+  passwordHash String
+  role         UserRole  @default(CUSTOMER)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  reportedTickets Ticket[] @relation("ReporterTickets")
+  assignedTickets Ticket[] @relation("AssigneeTickets")
+  comments        Comment[]
+}
+
 model Ticket {
   id            String         @id @default(uuid())
   title         String
   description   String
   status        TicketStatus   @default(OPEN)
   priority      TicketPriority @default(MEDIUM)
+
   customerEmail String
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  dueAt         DateTime
-  resolvedAt    DateTime?
+
+  reporterId String?
+  reporter   User? @relation("ReporterTickets", fields: [reporterId], references: [id])
+
+  assigneeId String?
+  assignee   User? @relation("AssigneeTickets", fields: [assigneeId], references: [id])
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  resolvedAt  DateTime?
+
+  firstResponseAt DateTime?
+
+  dueAt DateTime
+
+  comments Comment[]
 
   @@index([status])
   @@index([priority])
   @@index([dueAt])
+  @@index([assigneeId])
+  @@index([reporterId])
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  body      String
+  createdAt DateTime @default(now())
+
+  ticketId String
+  ticket   Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  authorId String
+  author   User @relation(fields: [authorId], references: [id])
+
+  @@index([ticketId])
+}
+
+model Holiday {
+  id        String   @id @default(uuid())
+  name      String
+  date      DateTime @unique
+  createdAt DateTime @default(now())
 }

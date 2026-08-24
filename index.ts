@@ -60,6 +60,7 @@ const typeDefs = /* GraphQL */ `
     dueAt: String!
     resolvedAt: String
     firstResponseAt: String
+    firstResponseDueAt: String
     slaBreached: Boolean!
   }
 
@@ -183,6 +184,7 @@ function formatTicket(ticket: {
   createdAt: Date;
   updatedAt: Date;
   dueAt: Date;
+  firstResponseDueAt: Date | null;
   resolvedAt: Date | null;
   firstResponseAt: Date | null;
   reporter: {
@@ -214,6 +216,7 @@ function formatTicket(ticket: {
     createdAt: ticket.createdAt.toISOString(),
     updatedAt: ticket.updatedAt.toISOString(),
     dueAt: ticket.dueAt.toISOString(),
+    firstResponseDueAt: ticket.firstResponseDueAt?.toISOString() ?? null,
     resolvedAt: ticket.resolvedAt?.toISOString() ?? null,
     firstResponseAt: ticket.firstResponseAt?.toISOString() ?? null,
     comments: ticket.comments.map(formatComment),

@@ -1,6 +1,6 @@
 import { DateTime } from "luxon";
 
-const TIMEZONE = process.env.SLA_TIMEZONE || "Asia/Kolkata";
+const TIMEZONE = process.env.BUSINESS_TIMEZONE || "Asia/Kolkata";
 
 const BUSINESS_START_HOUR = 9;
 const BUSINESS_END_HOUR = 18;

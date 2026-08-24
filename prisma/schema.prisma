@@ -7,6 +7,64 @@ datasource db {
   provider = "postgresql"
 }
 
+model User {
+  id              String    @id @default(uuid())
+  name            String
+  email           String    @unique
+  passwordHash    String
+  role            UserRole  @default(CUSTOMER)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  comments        Comment[]
+  assignedTickets Ticket[]  @relation("AssigneeTickets")
+  reportedTickets Ticket[]  @relation("ReporterTickets")
+}
+
+model Ticket {
+  id                 String         @id @default(uuid())
+  title              String
+  description        String
+  status             TicketStatus   @default(OPEN)
+  priority           TicketPriority @default(MEDIUM)
+  customerEmail      String
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  dueAt              DateTime
+  resolvedAt         DateTime?
+  assigneeId         String?
+  firstResponseAt    DateTime?
+  reporterId         String?
+  firstResponseDueAt DateTime?
+  comments           Comment[]
+  assignee           User?          @relation("AssigneeTickets", fields: [assigneeId], references: [id])
+  reporter           User?          @relation("ReporterTickets", fields: [reporterId], references: [id])
+
+  @@index([status])
+  @@index([priority])
+  @@index([dueAt])
+  @@index([assigneeId])
+  @@index([reporterId])
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  body      String
+  createdAt DateTime @default(now())
+  ticketId  String
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId])
+}
+
+model Holiday {
+  id        String   @id @default(uuid())
+  name      String
+  date      DateTime @unique
+  createdAt DateTime @default(now())
+}
+
 enum UserRole {
   ADMIN
   AGENT
@@ -25,72 +83,4 @@ enum TicketPriority {
   MEDIUM
   HIGH
   URGENT
-}
-
-model User {
-  id           String    @id @default(uuid())
-  name         String
-  email        String    @unique
-  passwordHash String
-  role         UserRole  @default(CUSTOMER)
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-
-  reportedTickets Ticket[] @relation("ReporterTickets")
-  assignedTickets Ticket[] @relation("AssigneeTickets")
-  comments        Comment[]
-}
-
-model Ticket {
-  id            String         @id @default(uuid())
-  title         String
-  description   String
-  status        TicketStatus   @default(OPEN)
-  priority      TicketPriority @default(MEDIUM)
-
-  customerEmail String
-
-  reporterId String?
-  reporter   User? @relation("ReporterTickets", fields: [reporterId], references: [id])
-
-  assigneeId String?
-  assignee   User? @relation("AssigneeTickets", fields: [assigneeId], references: [id])
-
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  resolvedAt  DateTime?
-
-  firstResponseAt DateTime?
-  firstResponseDueAt DateTime?
-
-  dueAt DateTime
-
-  comments Comment[]
-
-  @@index([status])
-  @@index([priority])
-  @@index([dueAt])
-  @@index([assigneeId])
-  @@index([reporterId])
-}
-
-model Comment {
-  id        String   @id @default(uuid())
-  body      String
-  createdAt DateTime @default(now())
-
-  ticketId String
-  ticket   Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
-
-  authorId String
-  author   User @relation(fields: [authorId], references: [id])
-
-  @@index([ticketId])
-}
-
-model Holiday {
-  id        String   @id @default(uuid())
-  name      String
-  date      DateTime @unique
-  createdAt DateTime @default(now())
 }

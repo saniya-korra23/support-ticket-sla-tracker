@@ -472,8 +472,7 @@ const resolvers = {
         !allowed[existing.status].includes(args.status)
       ) {
         throw new Error(
-          'Invalid status transition from ${existing.status} to ${args.status}',
-        );
+          throw new Error(Invalid status transition from ${existing.status} to ${args.status});
       }
 
       const ticket = await prisma.ticket.update({

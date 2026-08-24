@@ -117,11 +117,18 @@ const typeDefs = /* GraphQL */ `
   }
 `;
 
-const SLA_HOURS: Record<TicketPriority, number> = {
+const RESOLUTION_SLA_HOURS: Record<TicketPriority, number> = {
   LOW: 72,
   MEDIUM: 48,
   HIGH: 24,
   URGENT: 4,
+};
+
+const FIRST_RESPONSE_SLA_HOURS: Record<TicketPriority, number> = {
+  LOW: 24,
+  MEDIUM: 8,
+  HIGH: 4,
+  URGENT: 1,
 };
 
 type Context = {
@@ -382,12 +389,12 @@ const resolvers = {
 
       const dueAt = calculateSlaDueAt(
         new Date(),
-        SLA_HOURS[args.priority],
+        RESOLUTION_SLA_HOURS[args.priority],
       );
 
       const firstResponseDueAt = calculateSlaDueAt(
         new Date(),
-        SLA_HOURS[args.priority],
+        FIRST_RESPONSE_SLA_HOURS[args.priority],
       );
 
       const ticket = await prisma.ticket.create({

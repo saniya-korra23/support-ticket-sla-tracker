@@ -2,6 +2,7 @@ import { createSchema, createYoga } from "graphql-yoga";
 import { createServer } from "node:http";
 import { prisma } from "./lib/prisma";
 import { createToken, hashPassword, verifyPassword, verifyToken } from "./lib/auth";
+import { calculateSlaDueAt } from "./lib/sla";
 import type { UserRole, TicketPriority, TicketStatus } from "./generated/prisma/client";
 
 const typeDefs = /* GraphQL */ `
@@ -379,8 +380,14 @@ const resolvers = {
         throw new Error("Valid customer email is required");
       }
 
-      const dueAt = new Date(
-        Date.now() + SLA_HOURS[args.priority] * 60 * 60 * 1000,
+      const dueAt = calculateSlaDueAt(
+        new Date(),
+        SLA_HOURS[args.priority],
+      );
+
+      const firstResponseDueAt = calculateSlaDueAt(
+        new Date(),
+        SLA_HOURS[args.priority],
       );
 
       const ticket = await prisma.ticket.create({
@@ -390,6 +397,7 @@ const resolvers = {
           customerEmail: args.customerEmail.trim(),
           priority: args.priority,
           dueAt,
+          firstResponseDueAt,
           reporterId: user.id,
         },
         include: ticketInclude,

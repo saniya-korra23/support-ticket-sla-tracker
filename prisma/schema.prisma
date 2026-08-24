@@ -61,7 +61,7 @@ model Ticket {
   resolvedAt  DateTime?
 
   firstResponseAt DateTime?
-  fristResponseDueAt DateTime?
+  firstResponseDueAt DateTime?
 
   dueAt DateTime
 
